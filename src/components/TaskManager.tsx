@@ -1,19 +1,22 @@
 import { nanoid } from "nanoid";
-import { useState } from "react";
+import { useState, ChangeEvent, FC } from "react";
 import "./TaskManager.css";
 
-// TODO: create custom hook to manage task state
-export const TaskManager = () => {
-  const [title, setTitle] = useState("");
-  const [searchKeyword, setSearchKeyword] = useState("");
-  const [tasks, setTasks] = useState([]);
+interface Task {
+  id: string;
+  title: string;
+}
 
-  // remove task from list
-  const completeTask = (id) => {
+export const TaskManager: FC = () => {
+  const [title, setTitle] = useState<string>("");
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  const completeTask = (id: string) => {
     setTasks(tasks.filter((task) => task.id !== id));
   };
 
-  const updateTask = (id, taskUpdate) => {
+  const updateTask = (id: string, taskUpdate: Task) => {
     const newTasks = tasks.slice();
 
     const index = tasks.findIndex((task) => task.id === id);
@@ -28,8 +31,7 @@ export const TaskManager = () => {
       return;
     }
 
-    const newTask = {
-      // using nanoid to generate unique id
+    const newTask: Task = {
       id: nanoid(),
       title,
     };
@@ -37,7 +39,7 @@ export const TaskManager = () => {
     setTitle("");
   };
 
-  const handleSearch = (ev) => {
+  const handleSearch = (ev: ChangeEvent<HTMLInputElement>) => {
     setSearchKeyword(ev.target.value);
   };
 
@@ -73,7 +75,13 @@ export const TaskManager = () => {
                 type="text"
                 placeholder="Add new task"
                 value={task.title}
-                onChange={(e) => updateTask(task.id, { title: e.target.value })}
+                onChange={(e) => {
+                  const updatedTask: Task = {
+                    id: task.id,
+                    title: e.target.value,
+                  };
+                  updateTask(task.id, updatedTask);
+                }}
               />
               <button onClick={() => completeTask(task.id)}>Done</button>
             </div>
